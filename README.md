@@ -91,6 +91,8 @@ You can provide `D1_DATABASE_ID` explicitly, or allow auto-resolution via `wrang
 
 
 `npm run build` now includes deploy guards:
+- `postinstall` also runs `ensure:d1`, so Workers Builds patches a valid D1 id right after dependency install
+  (before `npm run build` and before `wrangler deploy`).
 - `validate:wrangler` checks worker-name drift / placeholder D1 issues.
 - `ensure:d1` auto-resolves the D1 database id for `ssi_d1` via `wrangler d1 list --json`
   and injects a valid `[[d1_databases]]` block before deploy (CI-safe).
