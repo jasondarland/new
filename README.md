@@ -90,6 +90,17 @@ wrangler deploy
 If you commit a placeholder D1 id, deployment fails at version upload with error `10021`.
 Use dashboard-managed D1 binding in CI, or commit only a real id.
 
+### Mandatory Cloudflare dashboard fix for error `10021`
+The specific error `binding DB of type d1 must have a valid id` is produced by Cloudflare when the Worker's **dashboard binding metadata** is invalid. This failure occurs even if your repository code is correct.
+
+Do this in Cloudflare Dashboard before redeploying:
+1. Go to **Workers & Pages → new → Settings → Bindings**.
+2. Remove the existing D1 binding named `DB`.
+3. Add D1 binding again with name `DB` and select the real database `ssi_d1`.
+4. Save, then redeploy.
+
+If build logs still print `name = "ssi-platform"` or `> vite build` (without `validate:wrangler`), your project is deploying an older branch/commit. Reconnect Workers Builds to the branch containing commit `0e8d8cb` or newer.
+
 ### Deployment troubleshooting (if CI still shows `ssi-platform` and D1 `10021`)
 If logs still show `name = "ssi-platform"` or `npm run build` runs only `vite build`, Cloudflare is deploying an **older commit/branch**.
 
