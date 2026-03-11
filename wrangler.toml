@@ -7,10 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 directory = "./dist/client"
 binding = "ASSETS"
 
-# NOTE:
-# D1 is intentionally not hard-coded here with a placeholder database_id.
-# In Workers Builds/CI, configure the DB binding in Cloudflare dashboard settings
-# (Binding name: DB), or run `wrangler d1 create` and add a real id before manual deploy.
+# IMPORTANT:
+# Do not commit placeholder D1 IDs. Workers Builds validates D1 bindings at deploy time.
+# Configure D1 binding `DB` in Cloudflare dashboard for CI, or add a real database_id
+# here for manual/local wrangler deploys.
 
 [[r2_buckets]]
 binding = "R2"

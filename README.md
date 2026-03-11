@@ -63,11 +63,9 @@ npm run dev
    ```bash
    wrangler d1 create ssi_d1
    ```
-2. Bind D1 to the Worker:
-   - **Workers Builds / CI**: add a D1 binding in Cloudflare dashboard for this Worker
-     with binding name `DB` and select your `ssi_d1` database.
-   - **Local/manual Wrangler deploy**: add a real `[[d1_databases]]` block with the actual
-     `database_id` returned by `wrangler d1 create`.
+2. Bind D1 to Worker binding `DB`:
+   - Workers Builds / CI: set D1 binding in Cloudflare dashboard (binding name `DB`).
+   - Manual Wrangler deploy: add `[[d1_databases]]` with the real `database_id` from `wrangler d1 create`.
 3. Apply migration:
    ```bash
    npm run db:migrate
@@ -84,8 +82,8 @@ wrangler deploy
 ```
 
 ### Important CI note (fixes `binding DB of type d1 must have a valid id`)
-If CI/Workers Builds is connected, do **not** commit placeholder D1 IDs. Configure D1 in
-Cloudflare project/Worker bindings (name `DB`) or set a real id in `wrangler.toml` for manual deploys.
+If you commit a placeholder D1 id, deployment fails at version upload with error `10021`.
+Use dashboard-managed D1 binding in CI, or commit only a real id.
 
 ## Environment variables
 Copy `.env.example` and configure in Cloudflare Worker settings/secrets:
