@@ -81,6 +81,11 @@ npm run build
 wrangler deploy
 ```
 
+`npm run build` now includes a Wrangler config validator to fail fast if:
+- worker name drifts from `new` (Workers Builds project mismatch), or
+- a placeholder D1 id is committed.
+
+
 ### Important CI note (fixes `binding DB of type d1 must have a valid id`)
 If you commit a placeholder D1 id, deployment fails at version upload with error `10021`.
 Use dashboard-managed D1 binding in CI, or commit only a real id.
