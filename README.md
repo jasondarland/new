@@ -126,6 +126,9 @@ Optional build-time vars for D1 auto-resolution:
 - `D1_BINDING_NAME` (default `DB`)
 - `D1_MIGRATIONS_DIR` (default `db/migrations`)
 
+## Emergency deploy fix checklist
+If Cloudflare still throws `10021`, follow `CLOUDFLARE_DEPLOY_FIX.md` exactly.
+
 ## Environment variables
 Copy `.env.example` and configure in Cloudflare Worker settings/secrets:
 - `JWT_SECRET`
