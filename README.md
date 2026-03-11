@@ -90,6 +90,14 @@ wrangler deploy
 If you commit a placeholder D1 id, deployment fails at version upload with error `10021`.
 Use dashboard-managed D1 binding in CI, or commit only a real id.
 
+### Deployment troubleshooting (if CI still shows `ssi-platform` and D1 `10021`)
+If logs still show `name = "ssi-platform"` or `npm run build` runs only `vite build`, Cloudflare is deploying an **older commit/branch**.
+
+1. In Cloudflare Workers Builds, confirm the connected branch is the one containing commit `0e8d8cb` (or newer).
+2. Re-run build after reconnecting/syncing the repository branch.
+3. In Worker **Settings → Bindings**, delete and recreate D1 binding `DB`, selecting your actual `ssi_d1` database.
+4. Verify the deploy logs no longer show worker-name mismatch and no longer report D1 validation `10021`.
+
 ## Environment variables
 Copy `.env.example` and configure in Cloudflare Worker settings/secrets:
 - `JWT_SECRET`
