@@ -1,0 +1,23 @@
+name = "new"
+main = "src/worker/index.ts"
+compatibility_date = "2025-02-24"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+
+# NOTE:
+# D1 is intentionally not hard-coded here with a placeholder database_id.
+# In Workers Builds/CI, configure the DB binding in Cloudflare dashboard settings
+# (Binding name: DB), or run `wrangler d1 create` and add a real id before manual deploy.
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "ssi-files"
+preview_bucket_name = "ssi-files-preview"
+
+[vars]
+APP_NAME = "Show Systems International Portal"
+JWT_ISSUER = "ssi-platform"
+TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"

@@ -1,0 +1,125 @@
+# Show Systems International (SSI) Cloudflare Platform
+
+Production-oriented full-stack application for SSI with a polished public marketing site and a secure role-based portal running on **Cloudflare Workers + D1 + R2 + Turnstile**.
+
+## Stack
+- React + React Router + Vite (public website + portal UX)
+- Cloudflare Workers runtime API (Hono)
+- Cloudflare D1 relational schema + migrations + seed data
+- Cloudflare R2 for secure files/download objects
+- Cloudflare Turnstile verification on auth/contact workflows
+- Optional Cloudflare Access for internal-only routes (`/portal/internal/*`)
+
+## Included deliverables
+- Full source code under `src/client` and `src/worker`
+- D1 migration at `db/migrations/0001_initial.sql`
+- Seed data at `db/seed.sql`
+- Environment template at `.env.example`
+- Cloudflare config at `wrangler.toml`
+- Demo accounts listed below
+
+## Feature coverage
+### Public website
+- Home, About, Products, IMMERSE™, TITAN™, Solutions, Support, Contact, Portal Login routes.
+
+### Portal + RBAC structure
+- Role-based navigation and dashboards for:
+  - Super Admin
+  - Internal Admin
+  - Project Manager
+  - Engineering
+  - Support
+  - Sales
+  - Installer / Integrator
+  - Client Admin
+  - Client User
+  - Accounting / Licensing Manager
+
+### Core modules represented
+1. Dashboard
+2. Projects
+3. Tasks / Milestones
+4. Support Tickets
+5. License Key Management
+6. Downloads Center
+7. Document Management
+8. Commissioning / Installation Tracking
+9. Client / Company Management
+10. User / Role / Permission Admin
+11. Activity Logs / Audit Logs
+12. Internal Announcements
+
+### Data model
+Tables include users, roles, permissions, companies, contacts, projects, project_members, milestones, tasks, tickets (+comments), licenses (+activation history), downloads, files, commissioning items, announcements, sessions, invitations, activity logs, and audit logs.
+
+## Local development
+```bash
+npm install
+npm run dev
+```
+
+## D1 setup & migration
+1. Create DB in Cloudflare:
+   ```bash
+   wrangler d1 create ssi_d1
+   ```
+2. Bind D1 to the Worker:
+   - **Workers Builds / CI**: add a D1 binding in Cloudflare dashboard for this Worker
+     with binding name `DB` and select your `ssi_d1` database.
+   - **Local/manual Wrangler deploy**: add a real `[[d1_databases]]` block with the actual
+     `database_id` returned by `wrangler d1 create`.
+3. Apply migration:
+   ```bash
+   npm run db:migrate
+   ```
+4. Seed:
+   ```bash
+   npm run db:seed
+   ```
+
+## Deploy to Cloudflare
+```bash
+npm run build
+wrangler deploy
+```
+
+### Important CI note (fixes `binding DB of type d1 must have a valid id`)
+If CI/Workers Builds is connected, do **not** commit placeholder D1 IDs. Configure D1 in
+Cloudflare project/Worker bindings (name `DB`) or set a real id in `wrangler.toml` for manual deploys.
+
+## Environment variables
+Copy `.env.example` and configure in Cloudflare Worker settings/secrets:
+- `JWT_SECRET`
+- `TURNSTILE_SECRET_KEY`
+- `TURNSTILE_SITE_KEY`
+- `PUBLIC_APP_URL`
+
+Set secrets:
+```bash
+wrangler secret put JWT_SECRET
+wrangler secret put TURNSTILE_SECRET_KEY
+```
+
+## Security notes
+- Turnstile validation is enforced on login endpoint.
+- Auth session is HttpOnly secure cookie.
+- Server-side authorization gate required for all `/api/*` portal resources.
+- Audit logging seeded and endpoint-integrated for auth events.
+- Structure supports strict client isolation by company and role filters (add row-level filters in every query before production launch).
+- Configure Cloudflare Access for internal ops routes if required.
+
+## Demo accounts (seed)
+Password for all demo users: `DemoPass!123`
+- `superadmin@ssi.demo` (Super Admin)
+- `pm@ssi.demo` (Project Manager)
+- `support@ssi.demo` (Support)
+- `clientadmin@ssi.demo` (Client Admin)
+- `clientuser@ssi.demo` (Client User)
+
+## Production hardening checklist
+- Replace plaintext password demo flow with Argon2 hashing.
+- Add company-scoped filters in all query builders.
+- Add full CRUD endpoints for every module plus pagination and search.
+- Add file malware scan + signed URL pattern for R2.
+- Add CSRF and strict rate-limits on auth endpoints.
+- Add unit/integration/e2e tests in CI.
