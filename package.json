@@ -14,7 +14,8 @@
     "db:seed": "wrangler d1 execute ssi_d1 --local --file=./db/seed.sql",
     "validate:wrangler": "node scripts/validate-wrangler.mjs",
     "ensure:d1": "node scripts/ensure-d1-binding.mjs",
-    "deploy:ci": "node scripts/deploy-ci.mjs"
+    "deploy:ci": "node scripts/deploy-ci.mjs",
+    "postinstall": "node scripts/postinstall-safe.mjs"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.5.0",

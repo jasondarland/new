@@ -130,6 +130,10 @@ Optional build-time vars for D1 auto-resolution:
 If install logs still show `$ node scripts/ensure-d1-binding.mjs`, Cloudflare is building an older commit.
 Make sure Workers Builds is pointed to commit `1460988` (or newer) where `postinstall` was removed.
 
+Install hook behavior:
+- `postinstall` now runs `scripts/postinstall-safe.mjs` (never fails install).
+
+If install still logs `$ node scripts/ensure-d1-binding.mjs` directly and fails, Cloudflare is using an older commit.
 ## Emergency deploy fix checklist
 If Cloudflare still throws `10021`, follow `CLOUDFLARE_DEPLOY_FIX.md` exactly.
 
