@@ -45,6 +45,12 @@ app.use('/api/*', async (c, next) => {
   await next();
 });
 
+function requireAuth(c: any) {
+  const user = c.get('user');
+  if (!user) return c.text('Unauthorized', 401);
+  return null;
+}
+
 app.get('/api/health', (c) => c.json({ ok: true, service: 'ssi-platform' }));
 
 app.post('/api/auth/login', async (c) => {
@@ -52,6 +58,8 @@ app.post('/api/auth/login', async (c) => {
   if (!parsed.success) return c.text('Invalid payload', 400);
   if (!(await verifyTurnstile(c, parsed.data.turnstileToken))) return c.text('Turnstile verification failed', 403);
 
+  const user = await c.env.DB.prepare('SELECT u.id,u.email,u.full_name,r.slug as role,u.company_id FROM users u JOIN roles r ON r.id=u.role_id WHERE u.email=? AND u.password_hash=? AND u.status="active"')
+    .bind(parsed.data.email.toLowerCase(), parsed.data.password).first();
   const user = await c.env.DB.prepare(
     'SELECT u.id,u.email,u.full_name,r.slug as role,u.company_id FROM users u JOIN roles r ON r.id=u.role_id WHERE u.email=? AND u.password_hash=? AND u.status="active"'
   ).bind(parsed.data.email.toLowerCase(), parsed.data.password).first();
@@ -70,17 +78,22 @@ app.post('/api/auth/login', async (c) => {
   return c.json({ ok: true });
 });
 
+app.post('/api/auth/logout', (c) => {
 app.post('/api/auth/logout', async (c) => {
   deleteCookie(c, 'ssi_session');
   return c.json({ ok: true });
 });
 
+app.get('/api/auth/me', (c) => {
 app.get('/api/auth/me', async (c) => {
   const user = c.get('user');
   if (!user) return c.text('Unauthorized', 401);
   return c.json({ user });
 });
 
+app.get('/api/dashboard', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const stats = await c.env.DB.prepare('SELECT (SELECT count(*) FROM projects) projects, (SELECT count(*) FROM tickets WHERE status IN ("open","in_progress")) openTickets, (SELECT count(*) FROM tasks WHERE status!="done") pendingTasks').first();
 function requireAuth(c: any) {
   const user = c.get('user');
   if (!user) return c.text('Unauthorized', 401);
@@ -101,6 +114,64 @@ app.get('/api/projects', async (c) => {
   return c.json(rows.results ?? []);
 });
 
+app.get('/api/tasks', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT title,status,priority,due_date FROM tasks ORDER BY due_date').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/tickets', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT title,status,priority,sla_due_at FROM tickets ORDER BY updated_at DESC').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/licenses', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT key_value,product_code,status,maintenance_status FROM licenses ORDER BY updated_at DESC').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/downloads', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT title,category,product_code FROM downloads ORDER BY created_at DESC').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/documents', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT title,category,visibility FROM files ORDER BY created_at DESC').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/commissioning', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT checklist_item,status,completed_at FROM commissioning_items ORDER BY created_at DESC').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/companies', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT name,company_type,billing_email FROM companies ORDER BY name').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/users', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT u.full_name,u.email,r.slug as role,u.status FROM users u JOIN roles r ON r.id=u.role_id ORDER BY u.full_name').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/audit', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT action,target_type,created_at FROM audit_logs ORDER BY created_at DESC LIMIT 100').all();
+  return c.json(rows.results ?? []);
+});
+
+app.get('/api/announcements', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const rows = await c.env.DB.prepare('SELECT title,body,starts_at FROM announcements ORDER BY created_at DESC').all();
+  return c.json(rows.results ?? []);
 app.get('/api/projects/:id', async (c) => {
   const auth = requireAuth(c); if (auth) return auth;
   const id = c.req.param('id');
