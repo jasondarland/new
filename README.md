@@ -75,6 +75,10 @@ npm run dev
    npm run db:seed
    ```
 
+### Install-phase hardening for Workers Builds
+This repo includes `bunfig.toml` and `.npmrc` with script execution disabled during dependency install.
+That prevents `bun install` from running lifecycle hooks (including any stale `postinstall`) in CI.
+
 ## Deploy to Cloudflare
 ```bash
 npm run build
