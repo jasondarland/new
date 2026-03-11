@@ -8,6 +8,22 @@ If you still see:
 
 then Cloudflare is deploying stale branch settings and/or stale binding metadata.
 
+
+## 0) Fast stale-commit check (most common root cause)
+If install logs contain:
+`$ node scripts/ensure-d1-binding.mjs`
+then Cloudflare is **not** using the latest commit, because current repo postinstall is a no-op.
+
+Expected latest behavior during install:
+`postinstall: hard no-op`
+
+Actions:
+1. Workers & Pages → project `new` → Settings → Builds.
+2. Confirm Production branch is correct.
+3. Click "Clear build cache".
+4. Reconnect repository (disconnect/connect) if branch already looks correct.
+5. Trigger new deploy from latest commit.
+
 ## 1) Force correct branch + latest commit
 1. Cloudflare Dashboard → Workers & Pages → your project (`new`) → Settings → Builds.
 2. Confirm **Production branch** is the branch containing latest commit.

@@ -131,7 +131,7 @@ Optional build-time vars for D1 auto-resolution:
 - `D1_MIGRATIONS_DIR` (default `db/migrations`)
 
 If install logs still show `$ node scripts/ensure-d1-binding.mjs`, Cloudflare is building an older commit.
-Make sure Workers Builds is pointed to commit `1460988` (or newer) where `postinstall` was removed.
+Make sure Workers Builds is pointed to commit `c101ce7` (or newer), then clear build cache and redeploy.
 
 Install hook behavior:
 - `postinstall` is a hard no-op.
