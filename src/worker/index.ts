@@ -20,6 +20,7 @@ const app = new Hono<{ Bindings: Env; Variables: Vars }>();
 app.use('/api/*', cors());
 
 const loginSchema = z.object({ email: z.string().email(), password: z.string().min(8), turnstileToken: z.string().min(8) });
+
 const signer = (secret: string) => new TextEncoder().encode(secret);
 
 async function verifyTurnstile(c: any, token: string) {
@@ -59,6 +60,10 @@ app.post('/api/auth/login', async (c) => {
 
   const user = await c.env.DB.prepare('SELECT u.id,u.email,u.full_name,r.slug as role,u.company_id FROM users u JOIN roles r ON r.id=u.role_id WHERE u.email=? AND u.password_hash=? AND u.status="active"')
     .bind(parsed.data.email.toLowerCase(), parsed.data.password).first();
+  const user = await c.env.DB.prepare(
+    'SELECT u.id,u.email,u.full_name,r.slug as role,u.company_id FROM users u JOIN roles r ON r.id=u.role_id WHERE u.email=? AND u.password_hash=? AND u.status="active"'
+  ).bind(parsed.data.email.toLowerCase(), parsed.data.password).first();
+
   if (!user) return c.text('Invalid credentials', 401);
 
   const token = await new SignJWT({ sub: user.id, email: user.email, fullName: user.full_name, role: user.role, companyId: user.company_id })
@@ -74,11 +79,13 @@ app.post('/api/auth/login', async (c) => {
 });
 
 app.post('/api/auth/logout', (c) => {
+app.post('/api/auth/logout', async (c) => {
   deleteCookie(c, 'ssi_session');
   return c.json({ ok: true });
 });
 
 app.get('/api/auth/me', (c) => {
+app.get('/api/auth/me', async (c) => {
   const user = c.get('user');
   if (!user) return c.text('Unauthorized', 401);
   return c.json({ user });
@@ -87,6 +94,17 @@ app.get('/api/auth/me', (c) => {
 app.get('/api/dashboard', async (c) => {
   const auth = requireAuth(c); if (auth) return auth;
   const stats = await c.env.DB.prepare('SELECT (SELECT count(*) FROM projects) projects, (SELECT count(*) FROM tickets WHERE status IN ("open","in_progress")) openTickets, (SELECT count(*) FROM tasks WHERE status!="done") pendingTasks').first();
+function requireAuth(c: any) {
+  const user = c.get('user');
+  if (!user) return c.text('Unauthorized', 401);
+  return null;
+}
+
+app.get('/api/dashboard', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const stats = await c.env.DB.prepare(
+    'SELECT (SELECT count(*) FROM projects) projects, (SELECT count(*) FROM tickets WHERE status IN ("open","in_progress")) openTickets, (SELECT count(*) FROM tasks WHERE status!="done") pendingTasks'
+  ).first();
   return c.json(stats);
 });
 
@@ -154,6 +172,23 @@ app.get('/api/announcements', async (c) => {
   const auth = requireAuth(c); if (auth) return auth;
   const rows = await c.env.DB.prepare('SELECT title,body,starts_at FROM announcements ORDER BY created_at DESC').all();
   return c.json(rows.results ?? []);
+app.get('/api/projects/:id', async (c) => {
+  const auth = requireAuth(c); if (auth) return auth;
+  const id = c.req.param('id');
+  const project = await c.env.DB.prepare('SELECT * FROM projects WHERE id=?').bind(id).first();
+  if (!project) return c.text('Not found', 404);
+  const [milestones, tasks, contacts, docs, downloads, licenses, tickets, commissioning, activity] = await Promise.all([
+    c.env.DB.prepare('SELECT * FROM milestones WHERE project_id=?').bind(id).all(),
+    c.env.DB.prepare('SELECT * FROM tasks WHERE project_id=?').bind(id).all(),
+    c.env.DB.prepare('SELECT * FROM contacts WHERE project_id=?').bind(id).all(),
+    c.env.DB.prepare('SELECT * FROM files WHERE project_id=?').bind(id).all(),
+    c.env.DB.prepare('SELECT * FROM downloads WHERE project_id=?').bind(id).all(),
+    c.env.DB.prepare('SELECT * FROM licenses WHERE project_id=?').bind(id).all(),
+    c.env.DB.prepare('SELECT * FROM tickets WHERE project_id=?').bind(id).all(),
+    c.env.DB.prepare('SELECT * FROM commissioning_items WHERE project_id=?').bind(id).all(),
+    c.env.DB.prepare('SELECT * FROM activity_logs WHERE project_id=? ORDER BY created_at DESC LIMIT 100').bind(id).all()
+  ]);
+  return c.json({ project, milestones: milestones.results, tasks: tasks.results, contacts: contacts.results, documents: docs.results, downloads: downloads.results, licenses: licenses.results, tickets: tickets.results, commissioning: commissioning.results, activity: activity.results });
 });
 
 app.post('/api/licenses/:id/reissue', async (c) => {

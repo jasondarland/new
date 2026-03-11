@@ -66,6 +66,7 @@ npm run dev
 2. Bind D1 to Worker binding `DB`:
    - Workers Builds / CI: set D1 binding in Cloudflare dashboard (binding name `DB`).
    - Manual Wrangler deploy: add `[[d1_databases]]` with the real `database_id` from `wrangler d1 create`.
+2. Replace `database_id` in `wrangler.toml`.
 3. Apply migration:
    ```bash
    npm run db:migrate

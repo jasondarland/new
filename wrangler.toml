@@ -1,4 +1,5 @@
 name = "new"
+name = "ssi-platform"
 main = "src/worker/index.ts"
 compatibility_date = "2025-02-24"
 compatibility_flags = ["nodejs_compat"]
@@ -11,6 +12,11 @@ binding = "ASSETS"
 # Do not commit placeholder D1 IDs. Workers Builds validates D1 bindings at deploy time.
 # Configure D1 binding `DB` in Cloudflare dashboard for CI, or add a real database_id
 # here for manual/local wrangler deploys.
+[[d1_databases]]
+binding = "DB"
+database_name = "ssi_d1"
+database_id = "replace-with-d1-id"
+migrations_dir = "db/migrations"
 
 [[r2_buckets]]
 binding = "R2"
