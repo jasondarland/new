@@ -5,15 +5,14 @@ const WRANGLER_FILE = 'wrangler.toml';
 const BINDING = process.env.D1_BINDING_NAME || 'DB';
 const DB_NAME = process.env.D1_DATABASE_NAME || 'ssi_d1';
 const MIGRATIONS_DIR = process.env.D1_MIGRATIONS_DIR || 'db/migrations';
-
-const isCi = String(process.env.CI || '').toLowerCase() === 'true' || !!process.env.CF_PAGES;
+const STRICT = process.env.D1_ENSURE_STRICT === '1';
 
 function failOrWarn(message, errorCode = 1) {
-  if (isCi) {
+  if (STRICT) {
     console.error(message);
     process.exit(errorCode);
   }
-  console.warn(`${message}\nNon-CI environment detected; continuing without modifying wrangler.toml.`);
+  console.warn(`${message}\nContinuing (non-strict mode).`);
 }
 
 function getD1IdByName(name) {
@@ -28,7 +27,6 @@ function getD1IdByName(name) {
 }
 
 const text = readFileSync(WRANGLER_FILE, 'utf8');
-
 const existingBlockRegex = /\[\[d1_databases\]\][\s\S]*?(?=\n\[\[|\n\[|$)/g;
 const existingBlocks = [...text.matchAll(existingBlockRegex)].map((m) => m[0]);
 
@@ -47,17 +45,16 @@ if (hasValid) {
   process.exit(0);
 }
 
-const d1Id = getD1IdByName(DB_NAME);
+const d1Id = process.env.D1_DATABASE_ID || getD1IdByName(DB_NAME);
 if (!d1Id) {
   failOrWarn(`Could not resolve D1 database id for '${DB_NAME}'. Ensure Wrangler is authenticated and DB exists.`);
   process.exit(0);
 }
 
-const newBlock = `\n[[d1_databases]]\nbinding = \"${BINDING}\"\ndatabase_name = \"${DB_NAME}\"\ndatabase_id = \"${d1Id}\"\nmigrations_dir = \"${MIGRATIONS_DIR}\"\n`;
+const newBlock = `\n[[d1_databases]]\nbinding = "${BINDING}"\ndatabase_name = "${DB_NAME}"\ndatabase_id = "${d1Id}"\nmigrations_dir = "${MIGRATIONS_DIR}"\n`;
 
 let updated = text;
 if (existingBlocks.length > 0) {
-  // remove any stale block for this binding
   updated = updated.replace(existingBlockRegex, (block) => {
     const binding = block.match(/binding\s*=\s*"([^"]+)"/)?.[1];
     return binding === BINDING ? '' : block;

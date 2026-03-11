@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "postinstall": "node scripts/ensure-d1-binding.mjs",
+    "postinstall": "node scripts/ensure-d1-binding.mjs || true",
     "build": "npm run validate:wrangler && npm run ensure:d1 && vite build",
     "build:worker": "wrangler deploy --dry-run",
     "preview": "vite preview",

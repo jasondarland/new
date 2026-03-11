@@ -122,6 +122,7 @@ If logs still show `name = "ssi-platform"` or `npm run build` runs only `vite bu
 4. Verify the deploy logs no longer show worker-name mismatch and no longer report D1 validation `10021`.
 
 Optional build-time vars for D1 auto-resolution:
+- `D1_ENSURE_STRICT=1` to make `ensure:d1` fail hard when ID resolution fails (default is warn/continue).
 - `D1_DATABASE_NAME` (default `ssi_d1`)
 - `D1_BINDING_NAME` (default `DB`)
 - `D1_MIGRATIONS_DIR` (default `db/migrations`)
