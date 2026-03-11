@@ -16,6 +16,10 @@ if (!nameMatch) {
   errors.push(`Worker name is "${nameMatch[1]}" but connected CI expects "new".`);
 }
 
+if (!process.env.CI && !process.env.CF_PAGES) {
+  // local checks are still useful, but this script is primarily a CI safeguard
+}
+
 if (errors.length) {
   console.error('\nWrangler config validation failed:\n');
   for (const err of errors) console.error(`- ${err}`);

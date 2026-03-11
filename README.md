@@ -81,9 +81,10 @@ npm run build
 wrangler deploy
 ```
 
-`npm run build` now includes a Wrangler config validator to fail fast if:
-- worker name drifts from `new` (Workers Builds project mismatch), or
-- a placeholder D1 id is committed.
+`npm run build` now includes deploy guards:
+- `validate:wrangler` checks worker-name drift / placeholder D1 issues.
+- `ensure:d1` auto-resolves the D1 database id for `ssi_d1` via `wrangler d1 list --json`
+  and injects a valid `[[d1_databases]]` block before deploy (CI-safe).
 
 
 ### Important CI note (fixes `binding DB of type d1 must have a valid id`)
@@ -108,6 +109,11 @@ If logs still show `name = "ssi-platform"` or `npm run build` runs only `vite bu
 2. Re-run build after reconnecting/syncing the repository branch.
 3. In Worker **Settings → Bindings**, delete and recreate D1 binding `DB`, selecting your actual `ssi_d1` database.
 4. Verify the deploy logs no longer show worker-name mismatch and no longer report D1 validation `10021`.
+
+Optional build-time vars for D1 auto-resolution:
+- `D1_DATABASE_NAME` (default `ssi_d1`)
+- `D1_BINDING_NAME` (default `DB`)
+- `D1_MIGRATIONS_DIR` (default `db/migrations`)
 
 ## Environment variables
 Copy `.env.example` and configure in Cloudflare Worker settings/secrets:
