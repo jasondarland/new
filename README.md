@@ -134,7 +134,8 @@ If install logs still show `$ node scripts/ensure-d1-binding.mjs`, Cloudflare is
 Make sure Workers Builds is pointed to commit `1460988` (or newer) where `postinstall` was removed.
 
 Install hook behavior:
-- `postinstall` is a no-op; install will not run D1 lookup.
+- `postinstall` is a hard no-op.
+- `scripts/ensure-d1-binding.mjs` is now guaranteed exit `0` (warn-only) even on unexpected errors.
 
 If install still logs `$ node scripts/ensure-d1-binding.mjs` directly and fails, Cloudflare is using an older commit.
 ## Emergency deploy fix checklist

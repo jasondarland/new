@@ -1,13 +1,23 @@
 import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
+process.exitCode = 0;
+process.on('uncaughtException', (err) => {
+  console.warn(`ensure-d1-binding uncaughtException: ${err instanceof Error ? err.message : String(err)}`);
+  process.exit(0);
+});
+process.on('unhandledRejection', (err) => {
+  console.warn(`ensure-d1-binding unhandledRejection: ${String(err)}`);
+  process.exit(0);
+});
+
 const WRANGLER_FILE = 'wrangler.toml';
 const BINDING = process.env.D1_BINDING_NAME || 'DB';
 const DB_NAME = process.env.D1_DATABASE_NAME || 'ssi_d1';
 const MIGRATIONS_DIR = process.env.D1_MIGRATIONS_DIR || 'db/migrations';
 
 function warn(message) {
-  console.warn(`${message}\nContinuing (ensure-d1-binding is non-blocking).`);
+  console.warn(`${message}\nContinuing (ensure-d1-binding never fails CI install).`);
 }
 
 function getD1IdByName(name) {
