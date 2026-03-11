@@ -144,3 +144,8 @@ button { background: #153968; cursor: pointer; }
     max-width: 100%;
   }
 }
+
+.section { padding: 1rem 0; }
+.section-title { display: grid; gap: .75rem; margin: .5rem 0 1rem; }
+.section-title p { color: var(--muted); max-width: 72ch; }
+.card { border: 1px solid #20304b; background: linear-gradient(180deg, #111c2d, #0f1724); }

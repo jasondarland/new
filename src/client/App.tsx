@@ -29,21 +29,93 @@ const DataTable = ({ columns, rows }: { columns: string[]; rows: Array<(string |
 
 function HomePage() {
   return (
-    <>
-      <Section title="Engineering Immersive Attractions at Enterprise Scale">
-        <p>Show Systems International (SSI) delivers high-reliability show control, ride integration, and lifecycle support for world-class attractions.</p>
-        <FeatureList items={[
-          'Mission-critical control for attractions and themed environments',
-          'Multi-site deployments with standardized commissioning practices',
-          '24/7 support programs with SLA-driven response and diagnostics'
-        ]} />
-      </Section>
-      <Section title="Trusted Platform Stack">
-        <FeatureList items={['IMMERSE™ media and show orchestration', 'TITAN™ industrial control backbone', 'SSI Portal for project, support, licensing, and documentation governance']} />
-      </Section>
-    </>
+    <section className="section" id="products">
+      <div className="container">
+        <div className="section-title">
+          <div>
+            <h2>Core Product Platforms</h2>
+          </div>
+          <p>
+            Show Systems International is built around two primary control platforms:
+            IMMERSE™ for distributed experience systems and TITAN™ for industrial
+            ride and attraction control.
+          </p>
+        </div>
+
+        <div className="two-platform-grid">
+          <article className="card platform-card platform-immerse">
+            <div className="platform-top">
+              <span className="platform-badge badge-immerse">Distributed Show Control</span>
+              <h3>IMMERSE™</h3>
+              <p>
+                IMMERSE™ is SSI’s distributed show control platform for immersive
+                attractions, museums, haunted houses, exhibits, interactive environments,
+                and multi-room experiences.
+              </p>
+            </div>
+
+            <div className="platform-columns">
+              <div>
+                <h4>Best For</h4>
+                <ul className="platform-list">
+                  <li>Haunted attractions</li>
+                  <li>Museums and exhibits</li>
+                  <li>Interactive walkthroughs</li>
+                  <li>Smaller to mid-size attractions</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4>Capabilities</h4>
+                <ul className="platform-list">
+                  <li>Distributed node architecture</li>
+                  <li>Audio, video, lighting, and GPIO control</li>
+                  <li>Trigger-based and timed events</li>
+                  <li>Flexible programming and runtime workflows</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article className="card platform-card platform-titan">
+            <div className="platform-top">
+              <span className="platform-badge badge-titan">Industrial Ride Show Control</span>
+              <h3>TITAN™</h3>
+              <p>
+                TITAN™ is SSI’s industrial rack-based control platform for ride systems,
+                dark rides, major attraction environments, synchronized scenes, and
+                mission-critical show execution.
+              </p>
+            </div>
+
+            <div className="platform-columns">
+              <div>
+                <h4>Best For</h4>
+                <ul className="platform-list">
+                  <li>Dark rides</li>
+                  <li>Roller coasters</li>
+                  <li>Large-scale attractions</li>
+                  <li>Centralized industrial control systems</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4>Capabilities</h4>
+                <ul className="platform-list">
+                  <li>Rack-based control architecture</li>
+                  <li>Ride and PLC interface support</li>
+                  <li>Redundant media and I/O infrastructure</li>
+                  <li>High-reliability attraction operation</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
   );
 }
+
 
 function AboutPage() {
   return <Section title="About SSI"><p>SSI partners with operators, EPC firms, integrators, and OEM teams to design, deploy, and support complex attraction technology programs from concept through operations.</p></Section>;
