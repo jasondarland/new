@@ -1,0 +1,151 @@
+:root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; --muted: #91a6c7; }
+body { margin: 0; background: #0a1019; color: #dce5f2; }
+.container { max-width: 1100px; margin: 0 auto; padding: 1.25rem; }
+.topbar { position: sticky; top: 0; background: rgba(4, 10, 18, .92); border-bottom: 1px solid #1f2b3d; z-index: 2; }
+.nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+a { color: #a7c7ff; text-decoration: none; font-size: .95rem; }
+.brand { font-weight: 700; letter-spacing: .08em; }
+.panel { background: linear-gradient(180deg, #111c2d, #0f1724); border: 1px solid #20304b; border-radius: 14px; padding: 1.5rem; margin-top: 1.2rem; }
+.portal-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.sidebar { display: flex; flex-direction: column; background: #0a131f; border-right: 1px solid #1f2b3d; padding: 1rem; gap: .7rem; }
+.portal-content { padding: 1rem 1.5rem; }
+.feature-list { margin: .5rem 0 0 1rem; }
+.feature-list li { margin: .25rem 0; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.kpis div { background: #0b1422; border: 1px solid #1f2b3d; border-radius: 10px; padding: .75rem; }
+.kpis h3 { margin: 0 0 .2rem 0; font-size: 1.4rem; }
+.table-wrap { overflow: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; border-bottom: 1px solid #1e2c43; padding: .55rem; }
+.stack { display: flex; flex-direction: column; gap: .65rem; max-width: 420px; }
+input, button { border-radius: 8px; border: 1px solid #2b3e5b; background: #091321; color: #dce5f2; padding: .65rem .75rem; }
+button { background: #153968; cursor: pointer; }
+.notice { border: 1px solid #1e2c43; border-radius: 10px; padding: .8rem; margin-top: .5rem; }
+.muted { color: #91a6c7; }
+@media (max-width: 900px) {
+  .portal-shell { grid-template-columns: 1fr; }
+  .sidebar { overflow-x: auto; flex-direction: row; }
+  .kpis { grid-template-columns: 1fr; }
+}
+
+.two-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.platform-card {
+  min-height: 100%;
+  padding: 28px;
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.platform-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.platform-immerse::before {
+  background:
+    radial-gradient(circle at top left, rgba(30,144,255,0.16), transparent 38%);
+}
+
+.platform-titan::before {
+  background:
+    radial-gradient(circle at top right, rgba(255,192,67,0.14), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(215,38,61,0.10), transparent 28%);
+}
+
+.platform-top {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 24px;
+}
+
+.platform-top h3 {
+  margin: 10px 0 12px;
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+}
+
+.platform-top p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 95%;
+}
+
+.platform-badge {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge-immerse {
+  background: rgba(30,144,255,0.12);
+  color: #cfe4ff;
+  border: 1px solid rgba(30,144,255,0.18);
+}
+
+.badge-titan {
+  background: rgba(255,192,67,0.12);
+  color: #ffe1a6;
+  border: 1px solid rgba(255,192,67,0.18);
+}
+
+.platform-columns {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.platform-columns h4 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.platform-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.platform-list li + li {
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .two-platform-grid,
+  .platform-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-card {
+    padding: 24px;
+  }
+
+  .platform-top h3 {
+    font-size: 1.7rem;
+  }
+
+  .platform-top p {
+    max-width: 100%;
+  }
+}
+
+.section { padding: 1rem 0; }
+.section-title { display: grid; gap: .75rem; margin: .5rem 0 1rem; }
+.section-title p { color: var(--muted); max-width: 72ch; }
+.card { border: 1px solid #20304b; background: linear-gradient(180deg, #111c2d, #0f1724); }

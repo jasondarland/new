@@ -1,0 +1,46 @@
+{
+  "name": "ssi-cloudflare-platform",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run validate:wrangler && npm run ensure:d1 && vite build",
+    "build:worker": "wrangler deploy --dry-run",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "db:migrate": "wrangler d1 migrations apply ssi_d1 --local",
+    "db:seed": "wrangler d1 execute ssi_d1 --local --file=./db/seed.sql",
+    "validate:wrangler": "node scripts/validate-wrangler.mjs",
+    "ensure:d1": "node scripts/ensure-d1-binding.mjs",
+    "deploy:ci": "node scripts/deploy-ci.mjs"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.5.0",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@tanstack/react-query": "^5.66.9",
+    "clsx": "^2.1.1",
+    "hono": "^4.7.2",
+    "jose": "^5.9.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "@types/node": "^22.13.10",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0",
+    "wrangler": "^4.4.0"
+  }
+}
