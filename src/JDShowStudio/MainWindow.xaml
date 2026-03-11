@@ -1,0 +1,217 @@
+<Window x:Class="JDShowStudio.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:utilities="clr-namespace:JDShowStudio.Utilities"
+        mc:Ignorable="d"
+        Title="JDShowStudio" Height="900" Width="1400">
+  <Window.Resources>
+    <utilities:TimeSpanToPixelsConverter x:Key="TimeSpanToPixelsConverter" />
+    <utilities:LayerIdToTopConverter x:Key="LayerIdToTopConverter" RowHeight="48" />
+    <utilities:TimeSpanDisplayConverter x:Key="TimeSpanDisplayConverter" />
+  </Window.Resources>
+  <Window.InputBindings>
+    <KeyBinding Key="Delete" Command="{Binding DeleteSelectedCuesCommand}" />
+  </Window.InputBindings>
+  <DockPanel>
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="_File">
+        <MenuItem Header="_New Project" Command="{Binding NewProjectCommand}" />
+        <MenuItem Header="_Open Project" Command="{Binding OpenProjectCommand}" />
+        <MenuItem Header="_Save Project" Command="{Binding SaveProjectCommand}" />
+        <Separator />
+        <MenuItem Header="_Export Show JSON" Command="{Binding ExportShowCommand}" />
+      </MenuItem>
+      <MenuItem Header="_Cue">
+        <MenuItem Header="_Add Cue" Command="{Binding AddCueCommand}" />
+        <MenuItem Header="_Delete Selected Cues" Command="{Binding DeleteSelectedCuesCommand}" />
+      </MenuItem>
+    </Menu>
+
+    <StatusBar DockPanel.Dock="Bottom">
+      <StatusBarItem>
+        <TextBlock Text="{Binding ProjectPath}" />
+      </StatusBarItem>
+      <StatusBarItem>
+        <TextBlock Text="{Binding IsDirty, StringFormat=Unsaved changes: {0}}" />
+      </StatusBarItem>
+      <StatusBarItem>
+        <TextBlock Text="{Binding LastAutoSaveTime, StringFormat=Last auto-save: {0:T}}" />
+      </StatusBarItem>
+    </StatusBar>
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="240" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="320" />
+      </Grid.ColumnDefinitions>
+
+      <Border Grid.Column="0" Background="#1E1E1E" Padding="12">
+        <StackPanel>
+          <TextBlock Text="Layers" FontSize="16" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,8" />
+          <ItemsControl ItemsSource="{Binding Layers}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Border Background="#2D2D2D" Padding="8" Margin="0,0,0,8" CornerRadius="4">
+                  <StackPanel>
+                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,6" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,6">
+                      <CheckBox Content="Mute" IsChecked="{Binding IsMuted}" Foreground="White" Margin="0,0,12,0" />
+                      <CheckBox Content="Lock" IsChecked="{Binding IsLocked}" Foreground="White" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                      <Button Content="Up" Command="{Binding DataContext.MoveLayerUpCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Margin="0,0,6,0" />
+                      <Button Content="Down" Command="{Binding DataContext.MoveLayerDownCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <Grid Grid.Column="1" Margin="8">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Background="#F5F5F5" Padding="8">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Project:" FontWeight="SemiBold" Margin="0,0,8,0" />
+            <TextBlock Text="{Binding ProjectName}" />
+            <TextBlock Text=" | " Margin="8,0" />
+            <TextBlock Text="Total Duration:" FontWeight="SemiBold" Margin="0,0,8,0" />
+            <TextBlock Text="{Binding TotalDuration}" />
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Background="White" BorderBrush="#D0D0D0" BorderThickness="1" Margin="0,8,0,0">
+          <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="*" />
+              </Grid.RowDefinitions>
+
+              <DockPanel Grid.Row="0">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Margin="8,0,0,0">
+                  <TextBlock Text="Zoom" VerticalAlignment="Center" Margin="0,0,6,0" />
+                  <Slider Width="120" Minimum="20" Maximum="120" Value="{Binding PixelsPerSecond}" />
+                  <CheckBox Content="Snap" IsChecked="{Binding IsSnapEnabled}" Margin="12,0,0,0" VerticalAlignment="Center" />
+                  <ComboBox Width="80" ItemsSource="{Binding SnapIntervals}" SelectedItem="{Binding SnapInterval}" Margin="6,0,0,0" IsEnabled="{Binding IsSnapEnabled}">
+                    <ComboBox.ItemTemplate>
+                      <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource TimeSpanDisplayConverter}}" />
+                      </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                  </ComboBox>
+                </StackPanel>
+
+                <ItemsControl>
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Border BorderBrush="#E0E0E0" BorderThickness="0,0,1,0"
+                              Width="{Binding DataContext.PixelsPerSecond, RelativeSource={RelativeSource AncestorType=Window}}">
+                        <TextBlock Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10" />
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                  <ItemsControl.ItemsSource>
+                    <Binding Path="TimeRulerTicks" />
+                  </ItemsControl.ItemsSource>
+                </ItemsControl>
+              </DockPanel>
+
+              <Canvas Grid.Row="1" Height="{Binding TimelineHeight}" Background="#FAFAFA">
+                <ListBox ItemsSource="{Binding Cues}"
+                         SelectionMode="Extended"
+                         utilities:SelectedItemsBehavior.SelectedItems="{Binding SelectedCues}"
+                         Background="Transparent"
+                         BorderThickness="0">
+                  <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <Canvas />
+                    </ItemsPanelTemplate>
+                  </ListBox.ItemsPanel>
+                  <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                      <Setter Property="Canvas.Left">
+                        <Setter.Value>
+                          <MultiBinding Converter="{StaticResource TimeSpanToPixelsConverter}">
+                            <Binding Path="StartTime" />
+                            <Binding Path="DataContext.PixelsPerSecond" RelativeSource="{RelativeSource AncestorType=Window}" />
+                          </MultiBinding>
+                        </Setter.Value>
+                      </Setter>
+                      <Setter Property="Canvas.Top">
+                        <Setter.Value>
+                          <MultiBinding Converter="{StaticResource LayerIdToTopConverter}">
+                            <Binding Path="LayerId" />
+                            <Binding Path="DataContext.Layers" RelativeSource="{RelativeSource AncestorType=Window}" />
+                          </MultiBinding>
+                        </Setter.Value>
+                      </Setter>
+                    </Style>
+                  </ListBox.ItemContainerStyle>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate>
+                      <Border Background="#7CB3FF" CornerRadius="4" Height="36" BorderBrush="#4A7DC7" BorderThickness="1">
+                        <Grid>
+                          <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="SemiBold" Margin="6,0,6,0" VerticalAlignment="Center" />
+                          <Thumb DragDelta="OnCueDragDelta" Cursor="SizeAll" Background="Transparent" />
+                          <Thumb DragDelta="OnCueResizeDelta"
+                                 HorizontalAlignment="Right"
+                                 Width="8"
+                                 Background="#2F5F9E"
+                                 Cursor="SizeWE" />
+                        </Grid>
+                        <Border.Width>
+                          <MultiBinding Converter="{StaticResource TimeSpanToPixelsConverter}">
+                            <Binding Path="Duration" />
+                            <Binding Path="DataContext.PixelsPerSecond" RelativeSource="{RelativeSource AncestorType=Window}" />
+                          </MultiBinding>
+                        </Border.Width>
+                      </Border>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </Canvas>
+            </Grid>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+
+      <Border Grid.Column="2" Background="#1E1E1E" Padding="12">
+        <StackPanel>
+          <TextBlock Text="Cue Inspector" FontSize="16" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,8" />
+          <StackPanel DataContext="{Binding SelectedCue}" Margin="0,8,0,0" IsEnabled="{Binding IsCueSelected}">
+            <TextBlock Text="Name" Foreground="White" />
+            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" />
+
+            <TextBlock Text="Start Time (hh:mm:ss)" Foreground="White" />
+            <TextBox Text="{Binding StartTime, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" />
+
+            <TextBlock Text="Duration (hh:mm:ss)" Foreground="White" />
+            <TextBox Text="{Binding Duration, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" />
+
+            <TextBlock Text="Layer" Foreground="White" />
+            <ComboBox ItemsSource="{Binding DataContext.Layers, RelativeSource={RelativeSource AncestorType=Window}}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="LayerId"
+                      SelectedValue="{Binding LayerId}"
+                      Margin="0,0,0,8" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </DockPanel>
+</Window>
