@@ -81,6 +81,15 @@ npm run build
 wrangler deploy
 ```
 
+### Workers Builds deploy command (recommended)
+Set the deploy command in Cloudflare Workers Builds to:
+```bash
+npm run deploy:ci
+```
+This command generates `.wrangler-ci.toml` with a real D1 `database_id` before deployment.
+You can provide `D1_DATABASE_ID` explicitly, or allow auto-resolution via `wrangler d1 list --json`.
+
+
 `npm run build` now includes deploy guards:
 - `validate:wrangler` checks worker-name drift / placeholder D1 issues.
 - `ensure:d1` auto-resolves the D1 database id for `ssi_d1` via `wrangler d1 list --json`
