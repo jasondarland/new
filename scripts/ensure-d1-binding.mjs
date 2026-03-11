@@ -5,15 +5,9 @@ const WRANGLER_FILE = 'wrangler.toml';
 const BINDING = process.env.D1_BINDING_NAME || 'DB';
 const DB_NAME = process.env.D1_DATABASE_NAME || 'ssi_d1';
 const MIGRATIONS_DIR = process.env.D1_MIGRATIONS_DIR || 'db/migrations';
-const STRICT = process.env.D1_ENSURE_STRICT === '1';
 
-function exitWithMessage(message, codeIfStrict = 1) {
-  if (STRICT) {
-    console.error(message);
-    process.exit(codeIfStrict);
-  }
-  console.warn(`${message}\nContinuing (non-strict mode).`);
-  process.exit(0);
+function warn(message) {
+  console.warn(`${message}\nContinuing (ensure-d1-binding is non-blocking).`);
 }
 
 function getD1IdByName(name) {
@@ -44,7 +38,8 @@ try {
 
   const d1Id = process.env.D1_DATABASE_ID || getD1IdByName(DB_NAME);
   if (!d1Id) {
-    exitWithMessage(`Could not resolve D1 database id for '${DB_NAME}'. Ensure Wrangler is authenticated and DB exists.`);
+    warn(`Could not resolve D1 database id for '${DB_NAME}'. Ensure Wrangler is authenticated and DB exists.`);
+    process.exit(0);
   }
 
   const newBlock = `\n[[d1_databases]]\nbinding = "${BINDING}"\ndatabase_name = "${DB_NAME}"\ndatabase_id = "${d1Id}"\nmigrations_dir = "${MIGRATIONS_DIR}"\n`;
@@ -65,6 +60,8 @@ try {
 
   writeFileSync(WRANGLER_FILE, updated);
   console.log(`Injected valid D1 binding (${BINDING} -> ${DB_NAME}/${d1Id}) into ${WRANGLER_FILE}.`);
+  process.exit(0);
 } catch (error) {
-  exitWithMessage(`ensure-d1-binding failed unexpectedly: ${error instanceof Error ? error.message : String(error)}`);
+  warn(`ensure-d1-binding failed unexpectedly: ${error instanceof Error ? error.message : String(error)}`);
+  process.exit(0);
 }

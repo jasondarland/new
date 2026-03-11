@@ -122,7 +122,6 @@ If logs still show `name = "ssi-platform"` or `npm run build` runs only `vite bu
 4. Verify the deploy logs no longer show worker-name mismatch and no longer report D1 validation `10021`.
 
 Optional build-time vars for D1 auto-resolution:
-- `D1_ENSURE_STRICT=1` to make `ensure:d1` fail hard when ID resolution fails (default is warn/continue).
 - `D1_DATABASE_NAME` (default `ssi_d1`)
 - `D1_BINDING_NAME` (default `DB`)
 - `D1_MIGRATIONS_DIR` (default `db/migrations`)
@@ -131,7 +130,7 @@ If install logs still show `$ node scripts/ensure-d1-binding.mjs`, Cloudflare is
 Make sure Workers Builds is pointed to commit `1460988` (or newer) where `postinstall` was removed.
 
 Install hook behavior:
-- `postinstall` now runs `scripts/postinstall-safe.mjs` (never fails install).
+- `postinstall` is a no-op; install will not run D1 lookup.
 
 If install still logs `$ node scripts/ensure-d1-binding.mjs` directly and fails, Cloudflare is using an older commit.
 ## Emergency deploy fix checklist

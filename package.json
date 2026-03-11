@@ -15,7 +15,7 @@
     "validate:wrangler": "node scripts/validate-wrangler.mjs",
     "ensure:d1": "node scripts/ensure-d1-binding.mjs",
     "deploy:ci": "node scripts/deploy-ci.mjs",
-    "postinstall": "node scripts/postinstall-safe.mjs"
+    "postinstall": "node -e \"console.log('postinstall: no-op')\""
   },
   "dependencies": {
     "@hono/zod-validator": "^0.5.0",
